@@ -175,6 +175,9 @@ func (pb *elasticUnsafeByteBuf) Read(p []byte) (n int, err error) {
 	} else {
 		readSize = pb.calcReadableBytes()
 	}
+	if readSize == 0 {
+		return 0, io.EOF
+	}
 	result := pb.ReadBytes(readSize)
 	copy(p, result)
 
