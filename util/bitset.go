@@ -111,7 +111,7 @@ func (bs *byteSliceBitSet) IsEmpty() bool {
 	return bs.wordInUse == 0
 }
 
-// Reset
+// Reset clean all bit.
 func (bs *byteSliceBitSet) Reset() {
 	bs.wordInUse = 0
 	bs.bytes = []byte{}

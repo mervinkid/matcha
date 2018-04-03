@@ -24,7 +24,8 @@ Allspark is a basic library of go language which include a lot of commonly used 
 - Goroutine wrapper with status tracking support.
 - Scheduler for task scheduling execution. Support fixed delay policy, fixed rate policy and [corntab](http://corntab.com) expression.
 - Infra interface definitions and helper methods.
-- BitSet data structure implementation.
+- BitSet interface and implementation.
+- Set interface and implementation.
 - APIs for configuration file loading. Support `JSON`,`YAML` and property file.
 - Abstract logger for logging.
 
