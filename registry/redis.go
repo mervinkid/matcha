@@ -55,6 +55,10 @@ type redisRegistry struct {
 	waitGroup  sync.WaitGroup
 }
 
+func (r *redisRegistry) String() string {
+	return "redis-registry-" + r.config.AppId
+}
+
 func (redisRegistry) Type() string {
 	return "redis"
 }
