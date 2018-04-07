@@ -44,5 +44,9 @@ func TestRedisRegistry(t *testing.T) {
 		}
 		registrySlice[i] = reg
 	}
-	time.Sleep(60 * time.Second)
+	time.Sleep(10 * time.Second)
+	for _, register := range registrySlice {
+		register.Stop()
+	}
+	time.Sleep(10 * time.Second)
 }

@@ -224,11 +224,11 @@ func (r *redisRegistry) changeRole(newRole Role, newMaster string) {
 
 func (r *redisRegistry) releaseRole() {
 	if r.role == Master {
-		nodeId, err := redis.String(r.redisConn.Do("GET ", r.electionKey()))
+		reply, err := r.redisConn.Do("GET ", r.electionKey())
 		if err != nil {
 			return
 		}
-		if nodeId == r.config.NodeId {
+		if nodeIdBytes, ok := reply.([]byte); ok && string(nodeIdBytes) == r.config.NodeId {
 			// Release
 			r.redisConn.Do("DEL", r.electionKey())
 		}
