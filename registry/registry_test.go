@@ -21,8 +21,8 @@ func TestRedis(t *testing.T) {
 }
 
 func TestRedisRegistry(t *testing.T) {
-	registrySlice := make([]registry.Registry, 3)
-	for i := 0; i < 3; i++ {
+	registrySlice := make([]registry.Registry, 1)
+	for i := 0; i < 1; i++ {
 		nodeId := "demo" + strconv.Itoa(i)
 		config := registry.Config{}
 		config.AppId = "demo"

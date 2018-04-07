@@ -224,7 +224,7 @@ func (r *redisRegistry) changeRole(newRole Role, newMaster string) {
 
 func (r *redisRegistry) releaseRole() {
 	if r.role == Master {
-		reply, err := r.redisConn.Do("GET ", r.electionKey())
+		reply, err := r.redisConn.Do("GET", r.electionKey())
 		if err != nil {
 			return
 		}
@@ -232,6 +232,6 @@ func (r *redisRegistry) releaseRole() {
 			// Release
 			r.redisConn.Do("DEL", r.electionKey())
 		}
+		r.changeRole(Slaver, unknownNodeId)
 	}
-	r.role = Slaver
 }
