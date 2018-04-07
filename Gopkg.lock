@@ -8,6 +8,15 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/gomodule/redigo"
+  packages = [
+    "internal",
+    "redis"
+  ]
+  revision = "9c11da706d9b7902c6da69c592f75637793fe121"
+  version = "v2.0.0"
+
+[[projects]]
   name = "github.com/vmihailenco/msgpack"
   packages = [
     ".",
@@ -47,6 +56,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7e070d16a091e44eb831210624a50c199c4ac678cd13ad6e01037fdca2e7ee72"
+  inputs-digest = "dc5b628ab75d0969153a6a4a8e32b5cc618eb7582905a53e0d92bad43941e2e2"
   solver-name = "gps-cdcl"
   solver-version = 1

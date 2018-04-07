@@ -22,6 +22,7 @@ Allspark is a basic library of go language which include a lot of commonly used 
 - Event driven and pipelined tcp framework include both server and client.
 - Some frame decoder and frame encoder for pipelined tcp framework.
 - Goroutine wrapper with status tracking support.
+- Registry for cluster node election.
 - Scheduler for task scheduling execution. Support fixed delay policy, fixed rate policy and [corntab](http://corntab.com) expression.
 - Infra interface definitions and helper methods.
 - BitSet interface and implementation.

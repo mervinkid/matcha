@@ -39,6 +39,12 @@ type Set interface {
 	// Range calls f sequentially for each key and value present in the set.
 	// If f returns false, range stops the iteration.
 	Range(f func(element interface{}) bool)
+	// Clear removes all of the elements from this set.
+	Clear()
+	// Intersection returns a Set with intersection elements between this Set and specified Set.
+	Intersection(set Set) Set
+	// Union returns a Set with union elements between this Set and specified Set.
+	Union(set Set) Set
 }
 
 // SafeHashSet is an implementation of Set interface provide parallel safe support.
@@ -102,7 +108,157 @@ func (s *safeHashSet) Size() int {
 	return s.elements
 }
 
+// Union returns a Set with union elements between this Set and specified Set.
+func (s *safeHashSet) Union(set Set) Set {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	newSet := &safeHashSet{}
+	s.setMap.Range(func(key, value interface{}) bool {
+		newSet.Add(key)
+		return true
+	})
+	if set != nil {
+		set.Range(func(element interface{}) bool {
+			if !newSet.Contains(element) {
+				newSet.Add(element)
+			}
+			return true
+		})
+	}
+	return newSet
+}
+
+// Intersection returns a Set with intersection elements between this Set and specified Set.
+func (s *safeHashSet) Intersection(set Set) Set {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	newSet := &safeHashSet{}
+	if set != nil {
+		set.Range(func(element interface{}) bool {
+			if _, ok := s.setMap.Load(element); ok {
+				newSet.Add(element)
+			}
+			return true
+		})
+	}
+	return newSet
+}
+
+// Clear removes all of the elements from this set.
+func (s *safeHashSet) Clear() {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	s.setMap = sync.Map{}
+}
+
 // NewSafeHashSet create a instance of Set with parallel safe support.
-func NewSafeHashSet() Set {
+func newSafeHashSet() Set {
 	return &safeHashSet{}
+}
+
+type hashSetMap map[interface{}]bool
+
+// HashSet is an implementation of Set interface based on hash table.
+type hashSet struct {
+	setMap hashSetMap
+}
+
+// Add the specified element to this set if it is not already present.
+func (s *hashSet) Add(element interface{}) {
+	s.checkInit()
+	_, ok := s.setMap[element]
+	if !ok {
+		s.setMap[element] = true
+	}
+}
+
+// Remove the specified element from this set if it is present.
+func (s *hashSet) Remove(element interface{}) {
+	s.checkInit()
+	delete(s.setMap, element)
+}
+
+// Contains returns true if this set contains the specified element.
+func (s *hashSet) Contains(element interface{}) bool {
+	s.checkInit()
+	_, ok := s.setMap[element]
+	return ok
+}
+
+// IsEmpty returns true if this set contains no elements.
+func (s *hashSet) IsEmpty() bool {
+	return len(s.setMap) == 0
+}
+
+// Size returns the number of elements in this set.
+func (s *hashSet) Size() int {
+	return len(s.setMap)
+}
+
+// Range calls f sequentially for each key and value present in the set.
+// If f returns false, range stops the iteration.
+func (s *hashSet) Range(f func(element interface{}) bool) {
+	if f != nil {
+		for k := range s.setMap {
+			if !f(k) {
+				break
+			}
+		}
+	}
+}
+
+// Clear removes all of the elements from this set.
+func (s *hashSet) Clear() {
+	s.setMap = make(hashSetMap)
+}
+
+// Intersection returns a Set with intersection elements between this Set and specified Set.
+func (s *hashSet) Intersection(set Set) Set {
+	newSet := newHashSet()
+	if set != nil {
+		set.Range(func(element interface{}) bool {
+			if _, ok := s.setMap[element]; ok {
+				newSet.Add(element)
+			}
+			return true
+		})
+	}
+	return newSet
+}
+
+// Union returns a Set with union elements between this Set and specified Set.
+func (s *hashSet) Union(set Set) Set {
+	newSet := newHashSet()
+	for k := range s.setMap {
+		newSet.Add(k)
+	}
+	if set != nil {
+		set.Range(func(element interface{}) bool {
+			if !newSet.Contains(element) {
+				newSet.Add(element)
+			}
+			return true
+		})
+	}
+	return newSet
+}
+
+func (s *hashSet) checkInit() {
+	if s.setMap == nil {
+		s.setMap = make(hashSetMap)
+	}
+}
+
+// NewHashSet create a instance of HashSet.
+func newHashSet() Set {
+	return &hashSet{}
+}
+
+// NewSet create a new instance of Set.
+// If the safe parameter is true, returns a new instance of SafeHashSet, or HashSet.
+func NewSet(safe bool) Set {
+	if safe {
+		return newSafeHashSet()
+	}
+	return newHashSet()
 }

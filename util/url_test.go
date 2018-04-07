@@ -20,31 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package misc
+package util_test
 
-// Sync is the interface that wraps the Sync() method which will block invoker goroutine.
-type Sync interface {
-	Sync()
-}
+import (
+	"github.com/mervinkid/allspark/util"
+	"testing"
+)
 
-// LifeCycle is the interface that wraps the basic method for standard service lifecycle control.
-type Lifecycle interface {
-	Start() error
-	Stop()
-	IsRunning() bool
-}
-
-// Init is the interface that wraps the basic method for init.
-type Init interface {
-	Init() error
-}
-
-// Close is the interface which wraps method Close().
-type Close interface {
-	Close()
-}
-
-// Type is the interface wraps method to get string type value.
-type Type interface {
-	Type() string
+func TestURL_Parse(t *testing.T) {
+	samples := []string{
+		"http://m.jd.com/signin",
+		"http://m.jd.com/signin?a=1&b=2&c=3",
+		"file:///tmp",
+		"ssh://usr:pwd@10.0.0.1",
+		"mysql://dbuser:dbpwd@db.test.com?charset=utf-8",
+	}
+	for _, sample := range samples {
+		url := util.URL{}
+		url.Parse(sample)
+		t.Log("sample:", sample)
+		t.Log("result:", url.String())
+	}
 }

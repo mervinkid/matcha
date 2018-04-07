@@ -20,31 +20,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package misc
+package util_test
 
-// Sync is the interface that wraps the Sync() method which will block invoker goroutine.
-type Sync interface {
-	Sync()
+import (
+	"github.com/mervinkid/allspark/util"
+	"testing"
+)
+
+var (
+	sampleA = []int{
+		1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+	}
+	sampleB = []int{
+		11, 12, 13, 14, 15, 16, 17, 18, 19, 10,
+	}
+)
+
+func TestSafeHashSet(t *testing.T) {
+	testSet(t, true)
 }
 
-// LifeCycle is the interface that wraps the basic method for standard service lifecycle control.
-type Lifecycle interface {
-	Start() error
-	Stop()
-	IsRunning() bool
+func TestHashSet(t *testing.T) {
+	testSet(t, false)
 }
 
-// Init is the interface that wraps the basic method for init.
-type Init interface {
-	Init() error
-}
-
-// Close is the interface which wraps method Close().
-type Close interface {
-	Close()
-}
-
-// Type is the interface wraps method to get string type value.
-type Type interface {
-	Type() string
+func testSet(t *testing.T, safe bool) {
+	set := util.NewSet(safe)
+	for _, item := range sampleA {
+		set.Add(item)
+	}
+	for _, item := range sampleA {
+		if !set.Contains(item) {
+			t.Fail()
+		}
+	}
+	for _, item := range sampleB {
+		if set.Contains(item) {
+			t.Fail()
+		}
+	}
 }

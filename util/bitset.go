@@ -42,7 +42,7 @@ type BitSet interface {
 	Reset()
 }
 
-// byteSliceBitSet is a implementation of BitSet interface based on byte slice.
+// ByteSliceBitSet is a implementation of BitSet interface based on byte slice.
 type byteSliceBitSet struct {
 	bytes     []byte
 	wordInUse int
