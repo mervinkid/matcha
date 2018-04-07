@@ -30,7 +30,6 @@ import (
 	"github.com/mervinkid/allspark/logging"
 	"github.com/mervinkid/allspark/misc"
 	"github.com/mervinkid/allspark/task"
-	"io"
 	"math/rand"
 	"strconv"
 	"sync"
@@ -40,6 +39,7 @@ import (
 const (
 	redisElectionTtl   = 6000
 	redisElectionDelay = 3 * time.Second
+	unknownNodeId      = "unknown"
 )
 
 type redisRegistry struct {
@@ -122,13 +122,8 @@ func (r *redisRegistry) checkConn() error {
 		if err == nil {
 			return nil
 		}
-		if err != nil && err != io.EOF {
-			return err
-		}
-		if err == io.EOF {
-			r.redisConn.Close()
-			r.redisConn = nil
-		}
+		r.redisConn.Close()
+		r.redisConn = nil
 	}
 	host := r.config.Url.Host
 	port := r.config.Url.Port
@@ -148,46 +143,44 @@ func (r *redisRegistry) electionTask() {
 	// Init node id
 	r.checkNodeId()
 	if err := r.checkConn(); err != nil {
-		r.changeRole(Slaver, "unknown")
+		logging.Error("Check connection with redis fail cause %s.", err)
+		r.changeRole(Slaver, unknownNodeId)
 		return
 	}
 
 	if r.role == Master {
 		// Valid role
-		nodeId, err := redis.String(r.redisConn.Do("GET", r.electionKey()))
+		reply, err := r.redisConn.Do("GET", r.electionKey())
 		if err != nil {
-			fmt.Printf("Try get value fail cause %s.", err.Error())
 			logging.Error("Try get value fail cause %s.", err.Error())
 			r.changeRole(Slaver, "unknown")
 			return
 		}
-		if nodeId == r.config.NodeId {
+		if nodeIdBytes, ok := reply.([]byte); ok && string(nodeIdBytes) == r.config.NodeId {
 			// Refresh data
 			result, err := redis.Int(r.redisConn.Do("PEXPIRE", r.electionKey(), redisElectionTtl))
 			if err != nil {
-				fmt.Printf("Refresh lock expire fail cause %s.\n", err.Error())
 				logging.Error("Refresh lock expire fail cause %s.", err.Error())
-				r.changeRole(Slaver, "unknown")
+				r.changeRole(Slaver, unknownNodeId)
 				return
 			}
 			if result == 1 {
 				r.changeRole(Master, r.config.NodeId)
 				return
 			} else {
-				r.changeRole(Slaver, "unknown")
+				r.changeRole(Slaver, unknownNodeId)
 				return
 			}
 		} else {
-			r.changeRole(Slaver, nodeId)
+			r.changeRole(Slaver, string(nodeIdBytes))
 			return
 		}
 
 	} else {
 		getLock, err := r.redisConn.Do("SET", r.electionKey(), r.config.NodeId, "NX", "PX", redisElectionTtl)
 		if err != nil {
-			fmt.Printf("Try get lock fail cause %s.\n", err.Error())
 			logging.Error("Try get lock fail cause %s.", err.Error())
-			r.changeRole(Slaver, "unknown")
+			r.changeRole(Slaver, unknownNodeId)
 			return
 		}
 		if getLock == "OK" {
@@ -197,14 +190,17 @@ func (r *redisRegistry) electionTask() {
 		} else {
 			// Lose lead
 			// Get current lead data
-			nodeId, err := redis.String(r.redisConn.Do("GET", r.electionKey()))
+			reply, err := r.redisConn.Do("GET", r.electionKey())
 			if err != nil {
-				fmt.Printf("Try get value fail cause %s.", err.Error())
 				logging.Error("Try get value fail cause %s.", err.Error())
-				r.changeRole(Slaver, "unknown")
+				r.changeRole(Slaver, unknownNodeId)
 				return
 			}
-			r.changeRole(Slaver, nodeId)
+			if nodeId, ok := reply.([]byte); ok {
+				r.changeRole(Slaver, string(nodeId))
+			} else {
+				r.changeRole(Slaver, unknownNodeId)
+			}
 			return
 		}
 	}
