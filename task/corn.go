@@ -100,9 +100,9 @@ type cornScheduler struct {
 	Task     func()
 	cornData *cornData
 	// State
-	state       state
-	stateMutex  sync.RWMutex
-	commandChan commandChan
+	state      state
+	stateMutex sync.RWMutex
+	stopC      stopChan
 }
 
 // Start will start scheduler for task scheduling execution.
@@ -126,22 +126,21 @@ func (s *cornScheduler) Start() error {
 	}
 	s.cornData = parsed
 
-	s.commandChan = initCommandChan()
+	s.stopC = initStopChan()
 
 	scheduler := parallel.NewGoroutine(func() {
 		// Whole second alignment
 		offset := int64(time.Second) - time.Now().UnixNano()%int64(time.Second)
-		var timer *time.Timer
-		timer = time.NewTimer(time.Duration(offset) * time.Nanosecond)
+		ticker := time.NewTicker(time.Duration(offset) * time.Nanosecond)
+		firstExecute := true
 
 		var latestTaskExecuteTimestamp int64
 		for {
 			select {
-			case <-s.commandChan:
-				timer.Stop()
-				close(s.commandChan) // Close command channel.
+			case <-s.stopC:
+				ticker.Stop()
 				return
-			case <-timer.C:
+			case <-ticker.C:
 				now := time.Now()
 				nowUnix := now.Unix()
 				if matchCornData(*s.cornData, now) && nowUnix != latestTaskExecuteTimestamp {
@@ -151,7 +150,10 @@ func (s *cornScheduler) Start() error {
 				}
 			}
 			// Match corn data every second
-			timer = time.NewTimer(1*time.Second - 10*time.Millisecond)
+			if !firstExecute {
+				firstExecute = false
+				ticker = time.NewTicker(1*time.Second - 10*time.Millisecond)
+			}
 		}
 	})
 	scheduler.Start()
@@ -165,7 +167,7 @@ func (s *cornScheduler) Stop() {
 	s.stateMutex.Lock()
 	defer s.stateMutex.Unlock()
 	if s.state == stateRunning {
-		s.commandChan <- commandStop
+		close(s.stopC)
 		s.state = stateFinish
 	}
 }

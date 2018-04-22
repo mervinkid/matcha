@@ -23,6 +23,7 @@
 package task
 
 import (
+	"github.com/mervinkid/allspark/logging"
 	"github.com/mervinkid/allspark/parallel"
 	"sync"
 	"time"
@@ -59,10 +60,10 @@ type fixedTimeScheduler struct {
 	Policy    fixedTimePolicy
 	Task      func()
 	// State
-	state       state
-	stateMutex  sync.RWMutex
-	scheduler   parallel.Goroutine
-	commandChan commandChan
+	state      state
+	stateMutex sync.RWMutex
+	scheduler  parallel.Goroutine
+	stopC      stopChan
 }
 
 // Start will start scheduler for task scheduling execution.
@@ -76,22 +77,21 @@ func (s *fixedTimeScheduler) Start() error {
 		return NoTaskError
 	}
 
-	s.commandChan = initCommandChan()
+	s.stopC = initStopChan()
 
 	s.scheduler = parallel.NewGoroutine(func() {
-		timer := time.NewTimer(0)
+		timer := time.NewTimer(s.FixedTime)
 		for {
 			select {
-			case <-s.commandChan:
+			case <-s.stopC:
 				timer.Stop()
-				close(s.commandChan) // Close command channel.
 				return
 			case <-timer.C:
 				// Execute task with policy.
-				executeTaskWithFixedTimePolicy(s.Policy, s.Task)
+				logging.Debug("Execute task with policy.")
+				s.execute()
+				timer = time.NewTimer(s.FixedTime)
 			}
-			// Update timer
-			timer = time.NewTimer(s.FixedTime)
 		}
 	})
 	s.scheduler.Start()
@@ -105,7 +105,7 @@ func (s *fixedTimeScheduler) Stop() {
 	s.stateMutex.Lock()
 	defer s.stateMutex.Unlock()
 	if s.state == stateRunning {
-		s.commandChan <- commandStop
+		close(s.stopC)
 		s.scheduler = nil
 		s.state = stateFinish
 	}
@@ -121,11 +121,11 @@ func (s *fixedTimeScheduler) IsRunning() bool {
 // executeTaskWithFixedTimePolicy will execute specified task function with policy.
 // If the policy is FixedDelay then execute in current goroutine or start a new
 // goroutine for task execution.
-func executeTaskWithFixedTimePolicy(policy fixedTimePolicy, task func()) {
-	if task != nil {
-		executor := parallel.NewGoroutine(task)
+func (s *fixedTimeScheduler) execute() {
+	if s.Task != nil {
+		executor := parallel.NewGoroutine(s.Task)
 		executor.Start()
-		switch policy {
+		switch s.Policy {
 		case fixedDelayPolicy:
 			executor.Join()
 			return

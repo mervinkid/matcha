@@ -34,8 +34,7 @@ const (
 )
 
 var (
-	InvalidChannelError = errors.New("invalid channel")
-	PipelineClosedError = errors.New("pipeline closed")
+	ErrInvalidChannel = errors.New("invalid channel")
 )
 
 type SendMessage interface {
@@ -76,7 +75,7 @@ func (c *pipelineChannel) Send(data interface{}) error {
 	if c.pipeline != nil && c.pipeline.IsRunning() {
 		return c.pipeline.Send(data)
 	}
-	return InvalidChannelError
+	return ErrInvalidChannel
 }
 
 // SendFuture send data async and the callback method will be invoked after data have been write to connection.
@@ -88,7 +87,7 @@ func (c *pipelineChannel) SendFuture(data interface{}, callback func(err error))
 	}
 
 	if callback != nil {
-		callback(InvalidChannelError)
+		callback(ErrInvalidChannel)
 	}
 }
 

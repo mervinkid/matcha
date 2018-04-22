@@ -23,21 +23,46 @@
 package task_test
 
 import (
+	"fmt"
 	"github.com/mervinkid/allspark/logging"
 	"github.com/mervinkid/allspark/task"
+	"log"
 	"runtime"
-	"sync"
 	"testing"
 	"time"
 )
 
+type TestLogger struct {
+
+}
+
+func (t *TestLogger) Trace(format string, args ...interface{}) {
+	log.Print("TRACE ", fmt.Sprintf(format, args...))
+}
+
+func (t *TestLogger) Debug(format string, args ...interface{}) {
+	log.Print("DEBUG ", fmt.Sprintf(format, args...))
+}
+
+func (t *TestLogger) Info(format string, args ...interface{}) {
+	log.Print("INFO  ", fmt.Sprintf(format, args...))
+}
+
+func (t *TestLogger) Warn(format string, args ...interface{}) {
+	log.Print("WARN  ", fmt.Sprintf(format, args...))
+}
+
+func (t *TestLogger) Error(format string, args ...interface{}) {
+	log.Print("ERROR ", fmt.Sprintf(format, args...))
+}
+
+func init() {
+	logging.AddLogger("CONSOLE", &TestLogger{})
+}
+
 func TestFixedDelayScheduler(t *testing.T) {
 
-	mutex := new(sync.Mutex)
-	cond := new(sync.Cond)
-	cond.L = mutex
-
-	logging.SetLogLevel(logging.LInfo)
+	logging.SetLogLevel(logging.LDebug)
 
 	scheduler := task.NewFixedDelayScheduler(func() {
 		logging.Info("Task start. Number of goroutine is %d.", runtime.NumGoroutine())
@@ -52,10 +77,6 @@ func TestFixedDelayScheduler(t *testing.T) {
 }
 
 func TestFixedRateScheduler(t *testing.T) {
-
-	mutex := new(sync.Mutex)
-	cond := new(sync.Cond)
-	cond.L = mutex
 
 	logging.SetLogLevel(logging.LInfo)
 
@@ -75,10 +96,9 @@ func TestNewCornScheduler(t *testing.T) {
 	logging.SetLogLevel(logging.LTrace)
 
 	taskFun := func() {
-		logging.Info("Work.")
 	}
 
-	scheduler := task.NewCornScheduler("* * * * * * * ?", taskFun)
+	scheduler := task.NewCornScheduler("*/2 * * * * * * ?", taskFun)
 	scheduler.Start()
 
 	time.Sleep(120 * time.Second)

@@ -54,11 +54,6 @@ const (
 	byteBufferSize = 2 * readBufferSize
 )
 
-// Command
-const (
-	cmdStop = iota
-)
-
 // Errors
 var (
 	NilInitializerError = errors.New("initializer is nil")
@@ -146,12 +141,12 @@ type duplexPipeline struct {
 	stateWaitGroup sync.WaitGroup
 
 	// Data chan
-	inboundDataChan  chan interface{}
-	outboundDataChan chan OutboundEntity
+	inboundDataC  chan interface{}
+	outboundDataC chan OutboundEntity
 
 	// Handler command chan
-	inboundHandlerCmdChan  chan uint8
-	outboundHandlerCmdChan chan uint8
+	inboundHandlerStopC  chan uint8
+	outboundHandlerStopC chan uint8
 
 	// Handler coroutine
 	connReadHandler parallel.Goroutine
@@ -271,7 +266,7 @@ func (cp *duplexPipeline) handleConnRead() {
 			if err != nil {
 				cp.handler.ChannelError(cp.channel, err)
 			} else if result != nil {
-				cp.inboundDataChan <- result
+				cp.inboundDataC <- result
 			} else {
 				break
 			}
@@ -298,12 +293,12 @@ func (cp *duplexPipeline) handleInbound() {
 
 	for {
 		select {
-		case inboundData := <-cp.inboundDataChan:
+		case inboundData := <-cp.inboundDataC:
 			if err := cp.handler.ChannelRead(cp.channel, inboundData); err != nil {
 				cp.handler.ChannelError(cp.channel, err)
 			}
 			continue
-		case <-cp.inboundHandlerCmdChan:
+		case <-cp.inboundHandlerStopC:
 			return
 		}
 	}
@@ -327,7 +322,7 @@ func (cp *duplexPipeline) handleOutbound() {
 
 	for {
 		select {
-		case outboundData := <-cp.outboundDataChan:
+		case outboundData := <-cp.outboundDataC:
 			data := outboundData.Data
 			callback := outboundData.Callback
 			// Encode
@@ -351,7 +346,7 @@ func (cp *duplexPipeline) handleOutbound() {
 				}
 				continue
 			}
-		case <-cp.outboundHandlerCmdChan:
+		case <-cp.outboundHandlerStopC:
 			return
 		}
 	}
@@ -380,12 +375,12 @@ func (cp *duplexPipeline) Init() error {
 		}
 
 		// Init data chan.
-		cp.inboundDataChan = make(chan interface{}, dataChanSize)
-		cp.outboundDataChan = make(chan OutboundEntity, dataChanSize)
+		cp.inboundDataC = make(chan interface{}, dataChanSize)
+		cp.outboundDataC = make(chan OutboundEntity, dataChanSize)
 
 		// Init handler command chan.
-		cp.inboundHandlerCmdChan = make(chan uint8, cmdChanSize)
-		cp.outboundHandlerCmdChan = make(chan uint8, cmdChanSize)
+		cp.inboundHandlerStopC = make(chan uint8, cmdChanSize)
+		cp.outboundHandlerStopC = make(chan uint8, cmdChanSize)
 
 		// Init network channel and make it bind with current pipeline.
 		cp.channel = NewChannel(cp)
@@ -408,8 +403,8 @@ func (cp *duplexPipeline) Stop() {
 	}
 
 	// Send  stop cmd to handlers
-	cp.inboundHandlerCmdChan <- cmdStop
-	cp.outboundHandlerCmdChan <- cmdStop
+	close(cp.inboundHandlerStopC)
+	close(cp.outboundHandlerStopC)
 	// Await termination
 	cp.inboundHandler.Join()
 	cp.outboundHandler.Join()
@@ -418,13 +413,9 @@ func (cp *duplexPipeline) Stop() {
 	cp.conn.Close()
 	cp.connReadHandler.Join()
 
-	// Close command channels
-	close(cp.inboundHandlerCmdChan)
-	close(cp.outboundHandlerCmdChan)
-
 	// Close data channels
-	close(cp.inboundDataChan)
-	close(cp.outboundDataChan)
+	close(cp.inboundDataC)
+	close(cp.outboundDataC)
 
 	// Change state
 	cp.state = stateShutdown
@@ -477,8 +468,8 @@ func (cp *duplexPipeline) SendFuture(msg interface{}, callback func(err error)) 
 		}
 	}
 
-	if cp.outboundDataChan != nil {
-		cp.outboundDataChan <- OutboundEntity{
+	if cp.outboundDataC != nil {
+		cp.outboundDataC <- OutboundEntity{
 			Data:     msg,
 			Callback: callback,
 		}

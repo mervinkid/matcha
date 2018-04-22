@@ -36,13 +36,7 @@ const (
 	stateFinish
 )
 
-type command uint8
-
-type commandChan chan command
-
-const (
-	commandStop command = iota
-)
+type stopChan chan uint8
 
 var (
 	NoTaskError = errors.New("no task to be scheduled execute")
@@ -103,6 +97,6 @@ func NewCornScheduler(corn string, task func()) Scheduler {
 	}
 }
 
-func initCommandChan() commandChan {
-	return make(chan command, 1)
+func initStopChan() stopChan{
+	return make(chan uint8, 1)
 }
