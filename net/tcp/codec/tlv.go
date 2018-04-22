@@ -26,7 +26,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"github.com/mervinkid/allspark/buffer"
+	"github.com/mervinkid/matcha/buffer"
 )
 
 const (

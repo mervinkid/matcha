@@ -24,11 +24,11 @@ package tcp_test
 
 import (
 	"fmt"
-	"github.com/mervinkid/allspark/net/tcp"
-	"github.com/mervinkid/allspark/net/tcp/codec"
-	"github.com/mervinkid/allspark/net/tcp/config"
-	"github.com/mervinkid/allspark/net/tcp/peer"
-	"github.com/mervinkid/allspark/parallel"
+	"github.com/mervinkid/matcha/net/tcp"
+	"github.com/mervinkid/matcha/net/tcp/codec"
+	"github.com/mervinkid/matcha/net/tcp/config"
+	"github.com/mervinkid/matcha/net/tcp/peer"
+	"github.com/mervinkid/matcha/parallel"
 	"log"
 	"net"
 	"testing"

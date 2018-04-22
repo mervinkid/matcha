@@ -3,8 +3,8 @@ package registry_test
 import (
 	"fmt"
 	"github.com/gomodule/redigo/redis"
-	"github.com/mervinkid/allspark/registry"
-	"github.com/mervinkid/allspark/util"
+	"github.com/mervinkid/matcha/registry"
+	"github.com/mervinkid/matcha/util"
 	"strconv"
 	"testing"
 	"time"

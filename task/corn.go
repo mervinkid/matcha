@@ -25,9 +25,9 @@ package task
 import (
 	"errors"
 	"fmt"
-	"github.com/mervinkid/allspark/logging"
-	"github.com/mervinkid/allspark/parallel"
-	"github.com/mervinkid/allspark/util"
+	"github.com/mervinkid/matcha/logging"
+	"github.com/mervinkid/matcha/parallel"
+	"github.com/mervinkid/matcha/util"
 	"math"
 	"regexp"
 	"strconv"

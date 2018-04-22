@@ -27,9 +27,9 @@ import (
 	"net"
 	"sync"
 
-	"github.com/mervinkid/allspark/logging"
-	"github.com/mervinkid/allspark/misc"
-	"github.com/mervinkid/allspark/parallel"
+	"github.com/mervinkid/matcha/logging"
+	"github.com/mervinkid/matcha/misc"
+	"github.com/mervinkid/matcha/parallel"
 )
 
 var NilListenerError = errors.New("listener is nil")

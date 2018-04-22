@@ -24,8 +24,8 @@ package registry
 
 import (
 	"errors"
-	"github.com/mervinkid/allspark/misc"
-	"github.com/mervinkid/allspark/util"
+	"github.com/mervinkid/matcha/misc"
+	"github.com/mervinkid/matcha/util"
 )
 
 var (

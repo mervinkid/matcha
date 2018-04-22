@@ -24,7 +24,7 @@ package codec
 
 import (
 	"encoding/binary"
-	"github.com/mervinkid/allspark/buffer"
+	"github.com/mervinkid/matcha/buffer"
 )
 
 // StringFrameDecoder is a bytes to string decoder implementation of FrameDecoder interface

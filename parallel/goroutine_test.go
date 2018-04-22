@@ -1,7 +1,7 @@
 package parallel_test
 
 import (
-	"github.com/mervinkid/allspark/parallel"
+	"github.com/mervinkid/matcha/parallel"
 	"testing"
 )
 

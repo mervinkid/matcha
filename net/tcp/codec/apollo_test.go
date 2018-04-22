@@ -23,7 +23,7 @@
 package codec
 
 import (
-	"github.com/mervinkid/allspark/buffer"
+	"github.com/mervinkid/matcha/buffer"
 	"testing"
 )
 

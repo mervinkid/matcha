@@ -25,7 +25,7 @@ package codec
 import (
 	"encoding/binary"
 
-	"github.com/mervinkid/allspark/buffer"
+	"github.com/mervinkid/matcha/buffer"
 	"github.com/vmihailenco/msgpack"
 )
 

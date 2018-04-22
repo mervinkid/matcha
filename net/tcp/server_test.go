@@ -23,8 +23,8 @@
 package tcp_test
 
 import (
-	"github.com/mervinkid/allspark/net/tcp"
-	"github.com/mervinkid/allspark/net/tcp/config"
+	"github.com/mervinkid/matcha/net/tcp"
+	"github.com/mervinkid/matcha/net/tcp/config"
 	"testing"
 )
 

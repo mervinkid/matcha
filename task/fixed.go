@@ -23,8 +23,8 @@
 package task
 
 import (
-	"github.com/mervinkid/allspark/logging"
-	"github.com/mervinkid/allspark/parallel"
+	"github.com/mervinkid/matcha/logging"
+	"github.com/mervinkid/matcha/parallel"
 	"sync"
 	"time"
 )

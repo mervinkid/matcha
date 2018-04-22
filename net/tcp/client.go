@@ -27,11 +27,11 @@ import (
 	"net"
 	"sync"
 
-	"github.com/mervinkid/allspark/logging"
-	"github.com/mervinkid/allspark/misc"
-	"github.com/mervinkid/allspark/net/tcp/config"
-	"github.com/mervinkid/allspark/net/tcp/peer"
-	"github.com/mervinkid/allspark/parallel"
+	"github.com/mervinkid/matcha/logging"
+	"github.com/mervinkid/matcha/misc"
+	"github.com/mervinkid/matcha/net/tcp/config"
+	"github.com/mervinkid/matcha/net/tcp/peer"
+	"github.com/mervinkid/matcha/parallel"
 )
 
 // Errors

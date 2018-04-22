@@ -23,7 +23,7 @@
 package peer
 
 import (
-	"github.com/mervinkid/allspark/net/tcp/codec"
+	"github.com/mervinkid/matcha/net/tcp/codec"
 )
 
 // ChannelHandler is the interface provide necessary methods for pipeline initialization which invoked by pipeline.

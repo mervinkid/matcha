@@ -25,7 +25,7 @@ package peer
 import (
 	"sync"
 
-	"github.com/mervinkid/allspark/misc"
+	"github.com/mervinkid/matcha/misc"
 )
 
 // ChannelGroup is a interface wraps methods for channel management which provide

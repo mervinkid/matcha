@@ -1,20 +1,20 @@
-# Allspark
+# Matcha
 
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat)
 ![License MIT](https://img.shields.io/badge/license-MIT-lightgray.svg?style=flat&maxAge=2592000)
 
 ```
-     _    _ _                      _    
-    / \  | | |___ _ __   __ _ _ __| | __
-   / _ \ | | / __| '_ \ / _` | '__| |/ /
-  / ___ \| | \__ \ |_) | (_| | |  |   < 
- /_/   \_\_|_|___/ .__/ \__,_|_|  |_|\_\
+ __  __    _  _____ ____ _   _    _    
+|  \/  |  / \|_   _/ ___| | | |  / \   
+| |\/| | / _ \ | || |   | |_| | / _ \  
+| |  | |/ ___ \| || |___|  _  |/ ___ \ 
+|_|  |_/_/   \_\_| \____|_| |_/_/   \_\
 
 ```
 
 ## Introduction
 
-Allspark is a basic library of go language which include a lot of commonly used functions that make development simply.
+Matcha is a basic library of go language which include a lot of commonly used functions that make development simply.
 
 ## Components
 
@@ -34,7 +34,7 @@ Allspark is a basic library of go language which include a lot of commonly used 
 
 Install:
 ```bash
-$ go get -u github.com/mervinkid/allspark
+$ go get -u github.com/mervinkid/matcha
 ```
 
 ## Development

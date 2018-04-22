@@ -23,13 +23,13 @@
 package peer
 
 import (
-	"github.com/mervinkid/allspark/buffer"
-	"github.com/mervinkid/allspark/misc"
-	"github.com/mervinkid/allspark/net/tcp/codec"
-	"github.com/mervinkid/allspark/parallel"
+	"github.com/mervinkid/matcha/buffer"
+	"github.com/mervinkid/matcha/misc"
+	"github.com/mervinkid/matcha/net/tcp/codec"
+	"github.com/mervinkid/matcha/parallel"
 
 	"errors"
-	"github.com/mervinkid/allspark/logging"
+	"github.com/mervinkid/matcha/logging"
 	"net"
 	"sync"
 )

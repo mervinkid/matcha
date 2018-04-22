@@ -24,8 +24,8 @@ package task_test
 
 import (
 	"fmt"
-	"github.com/mervinkid/allspark/logging"
-	"github.com/mervinkid/allspark/task"
+	"github.com/mervinkid/matcha/logging"
+	"github.com/mervinkid/matcha/task"
 	"log"
 	"runtime"
 	"testing"

@@ -23,8 +23,8 @@
 package util_test
 
 import (
-	"github.com/mervinkid/allspark/logging"
-	"github.com/mervinkid/allspark/util"
+	"github.com/mervinkid/matcha/logging"
+	"github.com/mervinkid/matcha/util"
 	"testing"
 )
 

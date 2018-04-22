@@ -24,7 +24,7 @@ package codec
 
 import (
 	"fmt"
-	"github.com/mervinkid/allspark/buffer"
+	"github.com/mervinkid/matcha/buffer"
 )
 
 // FrameDecoder is the interface that wraps the basic method for decode tcp stream.
